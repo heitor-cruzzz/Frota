@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BikeShare - Aluguel de Bicicletas 🚲</title>
+    <style>
+        :root {
+            --primary: #2a9d8f;
+            --secondary: #264653;
+            --accent: #e76f51;
+            --bg: #f4f6f8;
+            --card-bg: #ffffff;
+            --text: #212529;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        header h1 {
+            color: var(--secondary);
+            margin-bottom: 5px;
+        }
+       
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        .stat-card {
+            background: var(--card-bg);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border-top: 4px solid var(--primary);
+        }
+        .stat-card h3 {
+            margin: 0 0 5px 0;
+            color: #6c757d;
+            font-size: 14px;
+        }
+        .stat-card span {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--secondary);
+        }
+
+        .card-form {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        input, select {
+            padding: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: opacity 0.2s;
+        }
+        button:hover {
+            opacity: 0.9;
+        }
+
+        .grid-frota {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        .bike-card {
+            background: var(--card-bg);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .bike-img {
+            width: 100%;
+            height: 160px;
+            object-fit: cover;
+        }
+        .bike-content {
+            padding: 15px;
+            flex-grow: 1;
+        }
+        .bike-content h3 {
+            margin: 0 0 5px 0;
+            color: var(--secondary);
+        }
+        .bike-content p {
+            margin: 4px 0;
+            font-size: 14px;
+            color: #6c757d;
+        }
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-top: 8px;
+        }
+        .badge-livre { background: #d8f3dc; color: #1b4332; }
+        .badge-alugada { background: #fde2e4; color: #9b2226; }
+        .badge-reservada { background: #e9ecef; color: #495057; }
+        .badge-manutencao { background: #fff3b0; color: #856404; }
+ 
+        .card-actions {
+            padding: 15px;
+            background: #f8f9fa;
+            display: flex;
+            gap: 8px;
+            border-top: 1px solid #eee;
+        }
+        .btn-action {
+            flex: 1;
+            padding: 8px;
+            font-size: 13px;
+        }
+        .btn-rent { background-color: var(--primary); }
+        .btn-reserve { background-color: #f4a261; }
+        .btn-return { background-color: #264653; }
+        .btn-delete { background-color: #e76f51; }
+    </style>
+</head>
+<body>
+ 
+<div class="container">
+    <header>
+        <h1>🚲 BikeShare</h1>
+        <p>Sistema Inteligente de Aluguel e Reserva de Bicicletas</p>
+    </header>
+
+    <div class="dashboard">
+        <div class="stat-card">
+            <h3>Total de Bikes</h3>
+            <span id="stat-total">0</span>
+        </div>
+        <div class="stat-card">
+            <h3>Bikes Livres 🟢</h3>
+            <span id="stat-livres">0</span>
+        </div>
+        <div class="stat-card">
+            <h3>Alugadas / Em Uso 🔴</h3>
+            <span id="stat-alugadas">0</span>
+        </div>
+    </div>
+
+    <div class="card-form">
+        <h3 id="form-title" style="margin-top:0; color:var(--secondary)">Cadastrar Nova Bicicleta na Frota</h3>
+        <input type="hidden" id="bike-id">
+        <div class="form-grid">
+            <input type="text" id="modelo" placeholder="Modelo (ex: Caloi Mountain Bike)" required>
+            <input type="text" id="marca" placeholder="Marca (ex: Specialized)" required>
+            <input type="text" id="cor" placeholder="Cor Predominante" required>
+            <input type="text" id="foto" placeholder="URL da Foto (Opcional)" value="https://images.unsplash.com/photo-1485965120184-e220f721d03e?auto=format&fit=crop&w=500&q=80">
+        </div>
+        <button id="btn-salvar" onclick="salvarBicicleta()">Adicionar à Frota</button>
+    </div>
+ 
+    <div class="grid-frota" id="lista-bicicletas">
+        
+    </div>
+</div>
+ 
+<script>
+    
+    let frotaBikes = JSON.parse(localStorage.getItem('frotaBicicletasAluguel')) || [
+        { id: 1, modelo: "Caloi Explorer Aro 29", marca: "Caloi", cor: "Preto/Azul", status: "Livre 🟢", foto: "https://images.unsplash.com/photo-1576435728678-68d0fbf94e91?auto=format&fit=crop&w=500&q=80" },
+        { id: 2, modelo: "Speed Allez Sprint", marca: "Specialized", cor: "Vermelha", status: "Alugada 🔴", foto: "https://images.unsplash.com/photo-1485965120184-e220f721d03e?auto=format&fit=crop&w=500&q=80" },
+        { id: 3, modelo: "Urban City Bike", marca: "Monark", cor: "Verde", status: "Reservada ⏳", foto: "https://images.unsplash.com/photo-1507035895480-2b3156c31fc8?auto=format&fit=crop&w=500&q=80" }
+    ];
+ 
+    function atualizarDashboard() {
+        const total = frotaBikes.length;
+        const livres = frotaBikes.filter(b => b.status.includes('Livre')).length;
+        const alugadas = frotaBikes.filter(b => b.status.includes('Alugada') || b.status.includes('Reservada')).length;
+ 
+        document.getElementById('stat-total').innerText = total;
+        document.getElementById('stat-livres').innerText = livres;
+        document.getElementById('stat-alugadas').innerText = alugadas;
+    }
+ 
+    function renderizarFrota() {
+        const container = document.getElementById('lista-bicicletas');
+        container.innerHTML = '';
+ 
+        if (frotaBikes.length === 0) {
+            container.innerHTML = '<p style="color: #6c757d; grid-column: 1/-1; text-align: center;">Nenhuma bicicleta cadastrada.</p>';
+            atualizarDashboard();
+            return;
+        }
+ 
+        frotaBikes.forEach(bike => {
+            let badgeClass = 'badge-livre';
+            if (bike.status.includes('Alugada')) badgeClass = 'badge-alugada';
+            if (bike.status.includes('Reservada')) badgeClass = 'badge-reservada';
+            if (bike.status.includes('Manutenção')) badgeClass = 'badge-manutencao';
+ 
+            let botaoAcao = '';
+            if (bike.status.includes('Livre')) {
+                botaoAcao = `<button class="btn-action btn-rent" onclick="mudarStatus(${bike.id}, 'Alugada 🔴')">Alugar</button>`;
+            } else if (bike.status.includes('Alugada')) {
+                botaoAcao = `<button class="btn-action btn-reserve" onclick="mudarStatus(${bike.id}, 'Reservada ⏳')">Reservar Fila</button>`;
+            } else if (bike.status.includes('Reservada')) {
+                botaoAcao = `<button class="btn-action btn-return" onclick="mudarStatus(${bike.id}, 'Livre 🟢')">Liberar Bike</button>`;
+            } else {
+                botaoAcao = `<button class="btn-action btn-return" onclick="mudarStatus(${bike.id}, 'Livre 🟢')">Concluir Manutenção</button>`;
+            }
+ 
+            container.innerHTML += `
+                <div class="bike-card">
+                    <img src="${bike.foto || 'https://images.unsplash.com/photo-1485965120184-e220f721d03e?auto=format&fit=crop&w=500&q=80'}" class="bike-img" alt="Foto da Bike">
+                    <div class="bike-content">
+                        <h3>${bike.modelo}</h3>
+                        <p><strong>Marca:</strong> ${bike.marca}</p>
+                        <p><strong>Cor:</strong> ${bike.cor}</p>
+                        <span class="badge ${badgeClass}">${bike.status}</span>
+                    </div>
+                    <div class="card-actions">
+                        ${botaoAcao}
+                        <button class="btn-action btn-delete" onclick="removerBicicleta(${bike.id})">Excluir</button>
+                    </div>
+                </div>
+            `;
+        });
+ 
+        atualizarDashboard();
+        localStorage.setItem('frotaBicicletasAluguel', JSON.stringify(frotaBikes));
+    }
+ 
+    function salvarBicicleta() {
+        const idInput = document.getElementById('bike-id').value;
+        const modelo = document.getElementById('modelo').value;
+        const marca = document.getElementById('marca').value;
+        const cor = document.getElementById('cor').value;
+ 
+        if (!modelo || !marca || !cor) {
+            alert('Por favor, preencha os campos obrigatórios!');
+            return;
+        }
+ 
+        const novaBike = {
+            id: Date.now(),
+            modelo,
+            marca,
+            cor,
+            status: "Livre 🟢",
+            foto: foto || 'https://images.unsplash.com/photo-1485965120184-e220f721d03e?auto=format&fit=crop&w=500&q=80'
+        };
+ 
+        frotaBikes.push(novaBike);
+        limparFormulario();
+        renderizarFrota();
+    }
+ 
+    function mudarStatus(id, novoStatus) {
+        const bike = frotaBikes.find(b => b.id === id);
+        if (bike) {
+            bike.status = novoStatus;
+            renderizarFrota();
+        }
+    }
+ 
+    function removerBicicleta(id) {
+        if (confirm("Deseja realmente remover esta bicicleta do sistema?")) {
+            frotaBikes = frotaBikes.filter(b => b.id !== id);
+            renderizarFrota();
+        }
+    }
+ 
+    function limparFormulario() {
+        document.getElementById('modelo').value = '';
+        document.getElementById('marca').value = '';
+        document.getElementById('cor').value = '';
+    }
+ 
+    renderizarFrota();
+</script>
+ 
+</body>
+</html>
+ 
